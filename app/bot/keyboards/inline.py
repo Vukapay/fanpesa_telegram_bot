@@ -1,56 +1,41 @@
 """
 Inline keyboards for FanPesa Telegram Bot.
+
+Every button here is a `web_app` (opens the Mini App inside Telegram)
+or a `tg://` deep link (opens a Telegram chat) — none of them need a
+`CallbackQueryHandler` or a backend call, since Telegram resolves
+both button types entirely client-side.
 """
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from app.config.settings import settings
-from app.core.constants import CallbackData
+from app.core.constants import SUPPORT_PHONE_TELEGRAM
+
+SUPPORT_CHAT_URL = f"tg://resolve?phone={SUPPORT_PHONE_TELEGRAM}"
 
 
-def _open_app_button() -> InlineKeyboardButton:
-    return InlineKeyboardButton(
-        text="🚀 Open FanPesa",
-        web_app=WebAppInfo(url=settings.webapp_url),
-    )
+def _web_app_button(text: str, url: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(text=text, web_app=WebAppInfo(url=url))
 
 
 def launch_app_keyboard() -> InlineKeyboardMarkup:
-    """Primary keyboard shown on /start: launch button + quick actions."""
+    """Primary keyboard shown on /start — every action stays inside Telegram."""
 
     keyboard = [
-        [_open_app_button()],
+        [_web_app_button("🚀 Open FanPesa", settings.webapp_url)],
         [
-            InlineKeyboardButton("💰 Wallet", callback_data=CallbackData.WALLET),
-            InlineKeyboardButton("🎁 Promotions", callback_data=CallbackData.PROMOTIONS),
+            _web_app_button("📝 Register", settings.register_url),
+            _web_app_button("🔐 Login", settings.login_url),
         ],
         [
-            InlineKeyboardButton("💳 Deposit", callback_data=CallbackData.DEPOSIT),
-            InlineKeyboardButton("💸 Withdraw", callback_data=CallbackData.WITHDRAW),
+            _web_app_button("💳 Deposit", settings.deposit_url),
+            _web_app_button("💸 Withdraw", settings.withdraw_url),
         ],
         [
-            InlineKeyboardButton("🛟 Support", callback_data=CallbackData.SUPPORT),
+            InlineKeyboardButton("🛟 Contact Support", url=SUPPORT_CHAT_URL),
         ],
     ]
-
-    return InlineKeyboardMarkup(keyboard)
-
-
-def wallet_keyboard() -> InlineKeyboardMarkup:
-    """Keyboard shown alongside wallet balance/transaction messages."""
-
-    keyboard = [
-        [_open_app_button()],
-        [InlineKeyboardButton("🔙 Back to menu", callback_data=CallbackData.OPEN_APP)],
-    ]
-
-    return InlineKeyboardMarkup(keyboard)
-
-
-def promotions_keyboard() -> InlineKeyboardMarkup:
-    """Keyboard shown alongside the promotions list."""
-
-    keyboard = [[_open_app_button()]]
 
     return InlineKeyboardMarkup(keyboard)
 
@@ -59,7 +44,7 @@ def support_keyboard() -> InlineKeyboardMarkup:
     """Keyboard shown alongside the support message."""
 
     keyboard = [
-        [InlineKeyboardButton("🛟 Contact Support", url="https://www.fanpesa.com")],
+        [InlineKeyboardButton("🛟 Message Support", url=SUPPORT_CHAT_URL)],
     ]
 
     return InlineKeyboardMarkup(keyboard)

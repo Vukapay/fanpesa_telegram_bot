@@ -38,6 +38,12 @@ class Settings(BaseSettings):
 
     webapp_url: str = Field(default="https://www.fanpesa.com")
 
+    register_url: str = Field(default="https://www.fanpesa.com/register")
+    login_url: str = Field(default="https://www.fanpesa.com/login")
+    deposit_url: str = Field(default="https://www.fanpesa.com/deposit")
+    withdraw_url: str = Field(default="https://www.fanpesa.com/withdrawal")
+    promotion_url: str = Field(default="https://www.fanpesa.com/promotion")
+
     # -------------------------------------------------
     # Backend API
     # -------------------------------------------------

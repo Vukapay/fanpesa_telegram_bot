@@ -1,47 +1,32 @@
 """
 Telegram Webhook Endpoint
 
-The bot runs in polling mode for this milestone (see
-`app/bot/application.py`, run via `python -m app.bot.application`).
-This router documents and implements the webhook-mode wiring for
-when FanPesa moves off polling in production: Telegram would be
-configured (via `setWebhook`) to POST updates to
-`{WEBHOOK_URL}/webhooks/telegram`.
+Only active in production, when `WEBHOOK_URL` is set. `app/main.py`
+builds, starts, and registers the `python-telegram-bot` `Application`
+on FastAPI startup (see its `lifespan`) and stores it on
+`app.state.telegram_application`; this router just hands each
+incoming update to that already-running application.
 """
 
 from __future__ import annotations
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, HTTPException, Request, status
 from telegram import Update
-from telegram.ext import Application
-
-from app.bot.application import create_application
-from app.core.logger import get_logger
-
-logger = get_logger(__name__)
 
 router = APIRouter(prefix="/webhooks", tags=["webhooks"])
-
-_application: Application | None = None
-
-
-async def _get_application() -> Application:
-    """Lazily build and initialize the Telegram application, once."""
-    global _application
-
-    if _application is None:
-        _application = create_application()
-        await _application.initialize()
-
-    return _application
 
 
 @router.post("/telegram")
 async def telegram_webhook(request: Request) -> dict[str, bool]:
-    """Receive a Telegram update and dispatch it to the bot application."""
-    payload = await request.json()
-    application = await _get_application()
+    """Receive a Telegram update and dispatch it to the running bot application."""
+    application = request.app.state.telegram_application
+    if application is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Webhook mode is not configured — set WEBHOOK_URL and BOT_TOKEN.",
+        )
 
+    payload = await request.json()
     update = Update.de_json(payload, application.bot)
     await application.process_update(update)
 

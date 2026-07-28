@@ -8,7 +8,13 @@ from app.config.settings import settings
 
 
 def main_menu() -> ReplyKeyboardMarkup:
-    """Persistent menu: Open FanPesa, Wallet, Promotions, Deposit, Withdraw, Support, About."""
+    """Persistent menu: Open FanPesa, Register, Login, Deposit, Withdraw, Support, Promotion.
+
+    Open FanPesa/Register/Login/Deposit/Withdraw/Promotion open the
+    Mini App directly (`web_app`) — tapping them never sends a message
+    back to the bot, so no handler is registered for them. Support
+    does send a message, since it replies with bot-side content.
+    """
 
     keyboard = [
         [
@@ -18,16 +24,31 @@ def main_menu() -> ReplyKeyboardMarkup:
             ),
         ],
         [
-            KeyboardButton("💰 Wallet"),
-            KeyboardButton("🎁 Promotions"),
+            KeyboardButton(
+                "📝 Register",
+                web_app=WebAppInfo(url=settings.register_url),
+            ),
+            KeyboardButton(
+                "🔐 Login",
+                web_app=WebAppInfo(url=settings.login_url),
+            ),
         ],
         [
-            KeyboardButton("💳 Deposit"),
-            KeyboardButton("💸 Withdraw"),
+            KeyboardButton(
+                "💳 Deposit",
+                web_app=WebAppInfo(url=settings.deposit_url),
+            ),
+            KeyboardButton(
+                "💸 Withdraw",
+                web_app=WebAppInfo(url=settings.withdraw_url),
+            ),
         ],
         [
             KeyboardButton("🛟 Support"),
-            KeyboardButton("ℹ️ About"),
+            KeyboardButton(
+                "🎁 Promotion",
+                web_app=WebAppInfo(url=settings.promotion_url),
+            ),
         ],
     ]
 

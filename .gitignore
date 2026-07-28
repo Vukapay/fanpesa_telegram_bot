@@ -17,6 +17,10 @@ build/
 dist/
 *.egg-info/
 
+# Node / Cloudflare Workers tooling
+node_modules/
+.wrangler/
+
 # Logs
 logs/*.log
 logs/*.log.*

@@ -24,6 +24,11 @@ WEBSITE = "https://www.fanpesa.com"
 
 SUPPORT_EMAIL = "support@fanpesa.com"
 
+SUPPORT_PHONE_DISPLAY = "+254 745 275 966"
+
+# Digits-only, no leading "+" — required by Telegram's tg://resolve?phone= deep link.
+SUPPORT_PHONE_TELEGRAM = "254745275966"
+
 # =============================================================================
 # TELEGRAM
 # =============================================================================
@@ -140,43 +145,19 @@ class Buttons:
 
     OPEN_APP = "🚀 Open FanPesa"
 
-    WALLET = "💰 Wallet"
+    REGISTER = "📝 Register"
+
+    LOGIN = "🔐 Login"
 
     DEPOSIT = "💳 Deposit"
 
     WITHDRAW = "💸 Withdraw"
 
-    PROMOTIONS = "🎁 Promotions"
-
     SUPPORT = "🛟 Support"
 
-    ABOUT = "ℹ️ About"
+    PROMOTION = "🎁 Promotion"
 
     INVITE = "👥 Invite Friends"
-
-
-# =============================================================================
-# CALLBACK DATA
-# =============================================================================
-
-
-class CallbackData:
-
-    OPEN_APP = "open_app"
-
-    WALLET = "wallet"
-
-    DEPOSIT = "deposit"
-
-    WITHDRAW = "withdraw"
-
-    PROMOTIONS = "promotions"
-
-    SUPPORT = "support"
-
-    ABOUT = "about"
-
-    INVITE = "invite"
 
 
 # =============================================================================

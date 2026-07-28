@@ -1,0 +1,51 @@
+{
+  "$schema": "https://unpkg.com/wrangler/config-schema.json",
+  "name": "fanpesa-bot",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-07-28",
+
+  // Custom domain — requires fanpesa.com to be an active zone on this
+  // Cloudflare account. Remove this block to fall back to the default
+  // <name>.<subdomain>.workers.dev URL.
+  "routes": [
+    { "pattern": "bot.fanpesa.com", "custom_domain": true }
+  ],
+
+  // Runs the existing Dockerfile as a long-lived container instance.
+  "containers": [
+    {
+      "class_name": "FanPesaContainer",
+      "image": "./Dockerfile",
+      "instance_type": "lite",
+      "max_instances": 1
+    }
+  ],
+
+  // Containers are addressed through a Durable Object binding.
+  "durable_objects": {
+    "bindings": [
+      { "name": "FANPESA_CONTAINER", "class_name": "FanPesaContainer" }
+    ]
+  },
+
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["FanPesaContainer"] }
+  ],
+
+  // Non-secret configuration, visible in the dashboard. Anything
+  // sensitive (BOT_TOKEN, etc.) must be set with `wrangler secret put`
+  // instead — see README.md's "Deploying to Cloudflare" section.
+  "vars": {
+    "APP_NAME": "FanPesa Telegram Bot",
+    "ENVIRONMENT": "production",
+    "DEBUG": "False",
+    "LOG_LEVEL": "INFO",
+    "WEBAPP_URL": "https://www.fanpesa.com",
+    "REGISTER_URL": "https://www.fanpesa.com/register",
+    "LOGIN_URL": "https://www.fanpesa.com/login",
+    "DEPOSIT_URL": "https://www.fanpesa.com/deposit",
+    "WITHDRAW_URL": "https://www.fanpesa.com/withdrawal",
+    "PROMOTION_URL": "https://www.fanpesa.com/promotion",
+    "WEBHOOK_URL": "https://bot.fanpesa.com"
+  }
+}

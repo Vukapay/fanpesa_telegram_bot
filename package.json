@@ -1,0 +1,17 @@
+{
+  "name": "fanpesa-bot-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Thin Cloudflare Worker that fronts the FanPesa Telegram bot container",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail"
+  },
+  "dependencies": {
+    "@cloudflare/containers": "^0.3.7"
+  },
+  "devDependencies": {
+    "wrangler": "^4.114.0"
+  }
+}

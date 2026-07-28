@@ -8,7 +8,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from app.bot.keyboards.inline import support_keyboard
-from app.core.constants import SUPPORT_EMAIL
+from app.core.constants import SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY
 from app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -19,10 +19,10 @@ def build_support_text() -> str:
     return f"""
 🛟 *Need help?*
 
-Our support team is here for you.
+Tap below to message our support team directly on Telegram.
 
+📞 Phone: {SUPPORT_PHONE_DISPLAY}
 📧 Email: {SUPPORT_EMAIL}
-🌐 Website: https://www.fanpesa.com
 """
 
 

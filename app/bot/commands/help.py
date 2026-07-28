@@ -32,10 +32,11 @@ Available Commands
 /start — show the welcome message and launch FanPesa
 /help — show this message
 /about — learn more about FanPesa
-/support — get support contact details
+/support — message our support team directly on Telegram
 
-💰 Wallet, 🎁 Promotions, 💳 Deposit, 💸 Withdraw are available from
-the menu below.
+📝 Register, 🔐 Login, 💳 Deposit, 💸 Withdraw, and 🎁 Promotion open
+the FanPesa Mini App directly from the menu below — everything
+happens without ever leaving Telegram.
 
 Betting itself happens inside the FanPesa Mini App — tap
 "🚀 Open FanPesa" to place bets, track odds, and manage your slips.

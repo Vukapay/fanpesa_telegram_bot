@@ -34,12 +34,13 @@ async def start(
 
 The fastest betting experience inside Telegram.
 
+✅ Register
 ✅ Deposit
 ✅ Bet
 ✅ Win
 ✅ Withdraw
 
-👇 Tap below to launch FanPesa.
+👇 Tap below to get started — no need to leave Telegram.
 """,
         parse_mode="Markdown",
         reply_markup=launch_app_keyboard(),
