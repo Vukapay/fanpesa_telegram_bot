@@ -31,9 +31,9 @@ const FORWARDED_ENV_KEYS = [
   "DEPOSIT_URL",
   "WITHDRAW_URL",
   "PROMOTION_URL",
-  "API_BASE_URL",
+  "SUPPORT_EMAIL",
+  "SUPPORT_PHONE",
   "LOG_LEVEL",
-  "REDIS_URL",
 ];
 
 export class FanPesaContainer extends Container {

@@ -10,9 +10,10 @@ both button types entirely client-side.
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 
 from app.config.settings import settings
-from app.core.constants import SUPPORT_PHONE_TELEGRAM
 
-SUPPORT_CHAT_URL = f"tg://resolve?phone={SUPPORT_PHONE_TELEGRAM}"
+
+def _support_chat_url() -> str:
+    return f"tg://resolve?phone={settings.support_phone_telegram}"
 
 
 def _web_app_button(text: str, url: str) -> InlineKeyboardButton:
@@ -33,7 +34,7 @@ def launch_app_keyboard() -> InlineKeyboardMarkup:
             _web_app_button("💸 Withdraw", settings.withdraw_url),
         ],
         [
-            InlineKeyboardButton("🛟 Contact Support", url=SUPPORT_CHAT_URL),
+            InlineKeyboardButton("🛟 Contact Support", url=_support_chat_url()),
         ],
     ]
 
@@ -44,7 +45,7 @@ def support_keyboard() -> InlineKeyboardMarkup:
     """Keyboard shown alongside the support message."""
 
     keyboard = [
-        [InlineKeyboardButton("🛟 Message Support", url=SUPPORT_CHAT_URL)],
+        [InlineKeyboardButton("🛟 Message Support", url=_support_chat_url())],
     ]
 
     return InlineKeyboardMarkup(keyboard)

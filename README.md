@@ -1,77 +1,36 @@
-# FanPesa Telegram Bot & Platform SDK
+# FanPesa Telegram Bot
 
-Production-grade Telegram bot and reusable Platform Integration SDK for
-**FanPesa** ([www.fanpesa.com](https://www.fanpesa.com)), built for
-[@fanpesa_bot](https://t.me/fanpesa_bot).
+Telegram bot for **FanPesa** ([www.fanpesa.com](https://www.fanpesa.com)),
+built for [@fanpesa_bot](https://t.me/fanpesa_bot).
 
-The bot's menu (Register, Login, Deposit, Withdraw, Open FanPesa) opens
-the FanPesa Mini App directly inside Telegram via Telegram's native
-`web_app` buttons — the user never leaves the app. Support opens a
-Telegram chat with the FanPesa support line directly. None of this
-needs a backend call: Telegram resolves every button client-side.
-
-The reusable **Platform SDK** (`app/platform/`) and its backing
-services still exist underneath for capabilities the Telegram bot
-doesn't currently surface (wallet balance, promotions, referrals) —
-they're ready for a future browser or Safaricom OneApp integration,
-or for the bot to use again later, without any redesign. The backend
-team has not shipped real APIs yet, so those services still run on a
-**mock API layer** behind a clean service boundary.
+Every feature is a direct link opened inside Telegram — Register, Login,
+Deposit, Withdraw, Promotion, and Open FanPesa all open the FanPesa Mini
+App via Telegram's native `web_app` buttons, and Support opens a direct
+Telegram chat with the FanPesa support line. None of this needs a
+backend call: Telegram resolves every button entirely client-side, so
+the bot itself has no API layer, database, or business logic to
+maintain — it's a thin, static menu in front of pages that already
+exist on fanpesa.com.
 
 ## Overview
 
-- **Telegram bot** (`python-telegram-bot` v22, polling mode) — commands,
-  menus, and a Telegram WebApp launch button.
+- **Telegram bot** (`python-telegram-bot` v22) — `/start`, `/help`,
+  `/about`, `/support` commands, plus a persistent menu and inline
+  keyboard of direct links. Runs via polling locally, or via webhook
+  in production (see "Deploying to Cloudflare" below).
 - **FastAPI service** (`app/main.py`) — health/readiness/liveness
-  endpoints today; the future home of the FanPesa REST surface and
-  Telegram webhook mode.
-- **Platform SDK** (`app/platform/`) — a platform-agnostic interface
-  (`PlatformAdapter`) implemented by Telegram, browser, and (future)
-  Safaricom OneApp adapters, so new client integrations reuse the same
-  service layer without duplicating business logic.
-- **Mock API** (`app/api/mock.py`) — realistic, randomised sample data
-  standing in for the FanPesa backend until it ships.
+  endpoints, and (in production) the Telegram webhook endpoint.
 
-## Architecture
-
-```text
-Telegram / Web / OneApp
-        │
-        ▼
-Command Layer          (app/bot/commands, app/bot/handlers)
-        │
-        ▼
-Platform SDK Layer      (app/platform/base.py, telegram.py, browser.py, oneapp.py)
-        │
-        ▼
-Service Layer           (app/services/*)
-        │
-        ▼
-API / Repository Layer  (app/api/client.py, app/api/mock.py)
-        │
-        ▼
-FanPesa Backend APIs    (not yet available — mocked today)
-```
-
-**Rule:** the Telegram bot never calls backend APIs directly. Commands
-and handlers only depend on a `PlatformAdapter`; adapters depend on
-services; services depend on `app/api/client.py` (real) or
-`app/api/mock.py` (today).
-
-### Project layout
+## Project layout
 
 ```text
 app/
-├── api/            HTTP client + mock backend
-├── bot/            Commands, message handlers, keyboards, application factory
+├── bot/            Commands, keyboards, application factory
+│   ├── commands/   /start, /help, /about, /support
+│   └── keyboards/  Persistent menu + inline keyboard (web_app / tg:// links)
 ├── config/         Pydantic-settings configuration
-├── core/           Constants, exceptions, structured logging, security helpers
-├── database/       Redis wrapper (future use)
-├── models/         Typed Pydantic domain models
-├── platform/       Platform SDK: base interface + Telegram/browser/OneApp adapters
-├── services/       Business logic shared across all platforms
-├── utils/          Formatting and validation helpers
-├── webhooks/        Telegram webhook endpoint (for future webhook-mode)
+├── core/           Constants + structured logging
+├── webhooks/       Telegram webhook endpoint (production only)
 └── main.py         FastAPI application entry point
 ```
 
@@ -89,23 +48,23 @@ All configuration lives in a single `.env` file at the project root
 (gitignored — it holds the real bot token, so it's never committed).
 If you don't have one yet, create it with the variables below.
 
-| Variable        | Description                                     | Default                       |
-| --------------- | ------------------------------------------------ | ------------------------------ |
-| `APP_NAME`      | Application display name                          | `FanPesa Telegram Bot`         |
-| `APP_VERSION`   | Application version                               | `1.0.0`                        |
-| `ENVIRONMENT`   | `development`, `staging`, or `production`         | `development`                  |
-| `DEBUG`         | Enable debug behaviour                            | `True`                         |
-| `BOT_TOKEN`     | Telegram bot token — **never commit a real one**  | `CHANGE_ME`                    |
-| `WEBHOOK_URL`   | Public URL for webhook mode (leave blank in dev)  | *(empty)*                      |
-| `WEBAPP_URL`    | FanPesa Mini App URL opened by the launch button  | `https://www.fanpesa.com`      |
-| `REGISTER_URL`  | Mini App page opened by the Register button       | `https://www.fanpesa.com/register` |
-| `LOGIN_URL`     | Mini App page opened by the Login button          | `https://www.fanpesa.com/login`    |
-| `DEPOSIT_URL`   | Mini App page opened by the Deposit button        | `https://www.fanpesa.com/deposit`  |
-| `WITHDRAW_URL`  | Mini App page opened by the Withdraw button       | `https://www.fanpesa.com/withdrawal` |
-| `PROMOTION_URL` | Mini App page opened by the Promotion button      | `https://www.fanpesa.com/promotion` |
-| `API_BASE_URL`  | FanPesa backend base URL (used once available)    | `https://api.fanpesa.com`      |
-| `LOG_LEVEL`     | Python logging level                              | `INFO`                         |
-| `REDIS_URL`     | Redis connection URL (future use)                 | `redis://localhost:6379`       |
+| Variable        | Description                                       | Default                            |
+| --------------- | -------------------------------------------------- | ------------------------------------ |
+| `APP_NAME`      | Application display name                            | `FanPesa Telegram Bot`               |
+| `APP_VERSION`   | Application version                                 | `1.0.0`                              |
+| `ENVIRONMENT`   | `development`, `staging`, or `production`           | `development`                        |
+| `DEBUG`         | Enable debug behaviour                              | `True`                                |
+| `BOT_TOKEN`     | Telegram bot token — **never commit a real one**    | `CHANGE_ME`                          |
+| `WEBHOOK_URL`   | Public URL for webhook mode (leave blank in dev)    | *(empty)*                            |
+| `WEBAPP_URL`    | FanPesa Mini App URL opened by the launch button    | `https://www.fanpesa.com`            |
+| `REGISTER_URL`  | Mini App page opened by the Register button         | `https://www.fanpesa.com/register`   |
+| `LOGIN_URL`     | Mini App page opened by the Login button            | `https://www.fanpesa.com/login`      |
+| `DEPOSIT_URL`   | Mini App page opened by the Deposit button          | `https://www.fanpesa.com/deposit`    |
+| `WITHDRAW_URL`  | Mini App page opened by the Withdraw button         | `https://www.fanpesa.com/withdrawal` |
+| `PROMOTION_URL` | Mini App page opened by the Promotion button        | `https://www.fanpesa.com/promotion`  |
+| `SUPPORT_EMAIL` | Email shown by `/support`                           | `support@fanpesa.com`                |
+| `SUPPORT_PHONE` | Phone number `/support` opens a Telegram chat with  | `+254 745 275 966`                   |
+| `LOG_LEVEL`     | Python logging level                                | `INFO`                               |
 
 ## Running locally
 
@@ -129,7 +88,7 @@ uvicorn app.main:app --reload
 ```
 
 Visit `http://127.0.0.1:8000/` for application metadata, or
-`http://127.0.0.1:8000/health` for a mock-backed health check.
+`http://127.0.0.1:8000/health` for a health check.
 
 ### Run the bot
 
@@ -138,10 +97,9 @@ python -m app.bot.application
 ```
 
 The bot runs in polling mode and responds to `/start`, `/help`,
-`/about` (available as a slash command; no longer on the menu), and
-`/support`. The persistent menu's Register, Login, Deposit, Withdraw,
-and Promotion buttons open the Mini App directly and never reach the
-bot process at all — see "Telegram bot configuration" below.
+`/about`, and `/support`. The persistent menu's Register, Login,
+Deposit, Withdraw, and Promotion buttons open the Mini App directly
+and never reach the bot process at all.
 
 ## Running with Docker
 
@@ -149,10 +107,9 @@ bot process at all — see "Telegram bot configuration" below.
 docker compose up --build
 ```
 
-This starts the FastAPI app (port `8000`) and a Redis instance,
-loading configuration from `.env` and mounting the project directory
-for live-reload during development. Run the bot separately (Docker
-Compose here only runs the API + Redis):
+This starts the FastAPI app on port `8000`, loading configuration from
+`.env` and mounting the project directory for live-reload during
+development. Run the bot separately:
 
 ```powershell
 docker compose exec app python -m app.bot.application
@@ -173,35 +130,19 @@ docker compose exec app python -m app.bot.application
    doesn't use).
 4. Start the bot with `python -m app.bot.application` — polling mode
    requires no public URL.
-5. For production, switch to webhook mode: set `WEBHOOK_URL`, call
-   `setWebhook` pointing at `{WEBHOOK_URL}/webhooks/telegram`, and stop
-   running the polling process (`app/webhooks/telegram.py` already
-   implements the receiving endpoint).
+5. For production, switch to webhook mode: set `WEBHOOK_URL` — see
+   "Deploying to Cloudflare" below, which automates the rest.
 
 ### Support
 
 The "🛟 Support" button and `/support` command open a direct Telegram
-chat with the FanPesa support line (`app/core/constants.py:
-SUPPORT_PHONE_TELEGRAM`) via a `tg://resolve?phone=...` deep link —
-this only resolves if that number is registered with a Telegram
-account. To change the number, update `SUPPORT_PHONE_DISPLAY` and
-`SUPPORT_PHONE_TELEGRAM` in `app/core/constants.py`.
-
-## Future backend integration
-
-Every service in `app/services/` currently calls `app/api/mock.py`.
-Once the FanPesa backend is available:
-
-1. Implement the equivalent endpoints against `app/api/client.py`
-   (`APIClient.get` / `APIClient.post`).
-2. Swap the `mock_api` import in each service for `api_client` calls.
-3. No changes are required in `app/bot/`, `app/platform/`, or
-   `app/main.py` — they depend on service/adapter interfaces, not on
-   how data is sourced.
-
-The same `app/platform/base.py` interface is designed to be reused by
-future browser and Safaricom OneApp integrations (`app/platform/browser.py`,
-`app/platform/oneapp.py`) without duplicating business logic.
+chat with the FanPesa support line, using `SUPPORT_PHONE` from `.env`,
+via a `tg://resolve?phone=...` deep link — this only resolves if that
+number is registered with a Telegram account. `settings.support_phone_telegram`
+derives the digits-only format the deep link needs automatically, so
+`SUPPORT_PHONE` is the only value to update (in the display format,
+e.g. `+254 745 275 966`) — no separate digits-only variable to keep in
+sync. `SUPPORT_EMAIL` is also read from `.env`.
 
 ## Development workflow
 
@@ -223,7 +164,6 @@ pytest
 Test suite layout:
 
 - `tests/integration/` — FastAPI endpoint tests
-- `tests/services/` — service-layer unit tests (wallet, promotions)
 - `tests/commands/` — Telegram command unit tests (`/start`)
 
 ## Deployment guidance
@@ -235,9 +175,8 @@ Test suite layout:
   health-checked API.
 - In production, prefer Telegram **webhook mode** over polling (see
   above) so the bot can run behind the same infrastructure as the API.
-- Provide `BOT_TOKEN`, `WEBHOOK_URL`, `API_BASE_URL`, and `REDIS_URL`
-  via your deployment platform's secret/environment management — never
-  commit real values to `.env`.
+- Provide `BOT_TOKEN` and `WEBHOOK_URL` via your deployment platform's
+  secret/environment management — never commit real values to `.env`.
 
 ## Deploying to Cloudflare (Containers)
 
@@ -311,8 +250,8 @@ npx wrangler tail               # live logs
 
 ### Verify
 
-1. `https://bot.fanpesa.com/health` should return the mock-backed health
-   check (or the `workers.dev` URL if you haven't wired the domain yet).
+1. `https://bot.fanpesa.com/health` should return a healthy status (or
+   the `workers.dev` URL if you haven't wired the domain yet).
 2. Message `/start` to [@fanpesa_bot](https://t.me/fanpesa_bot) — updates
    now arrive via webhook instead of polling.
 3. `npx wrangler tail` streams the container's logs live if anything
@@ -328,11 +267,6 @@ npx wrangler tail               # live logs
   container after 10 minutes idle to save cost; the next request pays a
   cold-start cost (typically seconds). Raise it or remove it if instant
   responses matter more than idle cost.
-- **Redis isn't wired in yet.** `app/database/database.py` is
-  forward-looking scaffolding (see the Overview above) — nothing calls it
-  today, so its absence from this deployment isn't a gap. When it's
-  needed, use [Upstash Redis](https://developers.cloudflare.com/workers/learning/using-upstash-redis/)
-  or a `REDIS_URL` pointed at a Redis instance reachable from the container.
 - **This is a young Cloudflare product.** Containers moved to general
   availability recently and its `wrangler.jsonc` schema/CLI can still
   shift. If `wrangler deploy` errors out on something in this file,

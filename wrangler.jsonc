@@ -46,6 +46,8 @@
     "DEPOSIT_URL": "https://www.fanpesa.com/deposit",
     "WITHDRAW_URL": "https://www.fanpesa.com/withdrawal",
     "PROMOTION_URL": "https://www.fanpesa.com/promotion",
+    "SUPPORT_EMAIL": "support@fanpesa.com",
+    "SUPPORT_PHONE": "+254 745 275 966",
     "WEBHOOK_URL": "https://bot.fanpesa.com"
   }
 }

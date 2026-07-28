@@ -45,22 +45,22 @@ class Settings(BaseSettings):
     promotion_url: str = Field(default="https://www.fanpesa.com/promotion")
 
     # -------------------------------------------------
-    # Backend API
+    # Support
     # -------------------------------------------------
 
-    api_base_url: str = Field(default="https://api.fanpesa.com")
-
-    # -------------------------------------------------
-    # Redis
-    # -------------------------------------------------
-
-    redis_url: str = Field(default="redis://localhost:6379")
+    support_email: str = Field(default="support@fanpesa.com")
+    support_phone: str = Field(default="+254 745 275 966")
 
     # -------------------------------------------------
     # Logging
     # -------------------------------------------------
 
     log_level: str = Field(default="INFO")
+
+    @property
+    def support_phone_telegram(self) -> str:
+        """Digits-only phone number for Telegram's `tg://resolve?phone=` deep link."""
+        return "".join(char for char in self.support_phone if char.isdigit())
 
 
 @lru_cache

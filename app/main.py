@@ -20,10 +20,10 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
 
 from fastapi import FastAPI
 
-from app.api.mock import mock_api
 from app.bot.application import create_application
 from app.config.settings import settings
 from app.core.logger import logger
@@ -94,9 +94,9 @@ async def root() -> dict[str, str]:
 
 
 @app.get("/health")
-async def health() -> dict:
-    """Health check backed by the mock FanPesa API until the real backend is available."""
-    return await mock_api.heartbeat()
+async def health() -> dict[str, str]:
+    """Health check — confirms the process is up and able to serve requests."""
+    return {"status": "ok", "time": datetime.now(UTC).isoformat()}
 
 
 @app.get("/ready")

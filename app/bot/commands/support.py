@@ -8,7 +8,7 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from app.bot.keyboards.inline import support_keyboard
-from app.core.constants import SUPPORT_EMAIL, SUPPORT_PHONE_DISPLAY
+from app.config.settings import settings
 from app.core.logger import get_logger
 
 logger = get_logger(__name__)
@@ -21,8 +21,8 @@ def build_support_text() -> str:
 
 Tap below to message our support team directly on Telegram.
 
-📞 Phone: {SUPPORT_PHONE_DISPLAY}
-📧 Email: {SUPPORT_EMAIL}
+📞 Phone: {settings.support_phone}
+📧 Email: {settings.support_email}
 """
 
 
