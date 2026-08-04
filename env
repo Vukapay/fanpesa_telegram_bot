@@ -1,0 +1,38 @@
+###########################################
+# FanPesa Telegram Bot
+###########################################
+
+APP_NAME=FanPesa Telegram Bot
+APP_VERSION=1.0.0
+ENVIRONMENT=development
+DEBUG=True
+
+###########################################
+# Telegram
+###########################################
+
+BOT_TOKEN=8958393631:AAGnrQKd9sb732AR2uDapSUjQ5s_1D6zEQg
+
+WEBHOOK_URL=
+WEBAPP_URL=https://www.fanpesa.com
+
+# Mini App pages opened directly by the bot's menu buttons.
+# Update these any time the real pages change — no code changes needed.
+REGISTER_URL=https://www.fanpesa.com/register
+LOGIN_URL=https://www.fanpesa.com/login
+DEPOSIT_URL=https://www.fanpesa.com/deposit
+WITHDRAW_URL=https://www.fanpesa.com/withdrawal
+PROMOTION_URL=https://www.fanpesa.com/promotion
+
+###########################################
+# Support
+###########################################
+
+SUPPORT_EMAIL=support@fanpesa.com
+SUPPORT_PHONE=+254 745 275 966
+
+###########################################
+# Logging
+###########################################
+
+LOG_LEVEL=INFO

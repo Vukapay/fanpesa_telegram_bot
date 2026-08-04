@@ -13,10 +13,13 @@ from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request, status
 from telegram import Update
 
-router = APIRouter(prefix="/webhooks", tags=["webhooks"])
+router = APIRouter(tags=["webhooks"])
+WEBHOOK_PATH = "/webhooks/telegram"
 
 
-@router.post("/telegram")
+@router.post(WEBHOOK_PATH)
+@router.post("/webhook")
+@router.post("/telegram/webhook")
 async def telegram_webhook(request: Request) -> dict[str, bool]:
     """Receive a Telegram update and dispatch it to the running bot application."""
     application = request.app.state.telegram_application

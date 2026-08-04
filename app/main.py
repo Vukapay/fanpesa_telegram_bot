@@ -27,13 +27,20 @@ from fastapi import FastAPI
 from app.bot.application import create_application
 from app.config.settings import settings
 from app.core.logger import logger
-from app.webhooks.telegram import router as telegram_webhook_router
-
-WEBHOOK_PATH = "/webhooks/telegram"
+from app.webhooks.telegram import WEBHOOK_PATH, router as telegram_webhook_router
 
 
 def _is_bot_token_configured() -> bool:
     return bool(settings.bot_token) and settings.bot_token != "CHANGE_ME"
+
+
+def _build_webhook_url(base_url: str) -> str:
+    """Normalize the configured base URL into a Telegram-compatible webhook target."""
+    normalized = base_url.rstrip("/")
+    for suffix in (WEBHOOK_PATH, "/webhook", "/telegram/webhook"):
+        if normalized.endswith(suffix):
+            return normalized
+    return f"{normalized}{WEBHOOK_PATH}"
 
 
 @asynccontextmanager
@@ -51,11 +58,14 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         await application.initialize()
         await application.start()
 
-        webhook_url = f"{settings.webhook_url.rstrip('/')}{WEBHOOK_PATH}"
-        await application.bot.set_webhook(url=webhook_url)
+        webhook_url = _build_webhook_url(settings.webhook_url)
+        try:
+            await application.bot.set_webhook(url=webhook_url)
+        except Exception as exc:  # pragma: no cover - defensive logging for deployment issues
+            logger.warning("Telegram webhook registration failed for %s: %s", webhook_url, exc)
 
         app.state.telegram_application = application
-        logger.info("Telegram webhook registered at %s", webhook_url)
+        logger.info("Telegram webhook target configured at %s", webhook_url)
     elif settings.webhook_url:
         logger.warning(
             "WEBHOOK_URL is set but BOT_TOKEN is not configured — skipping webhook setup"

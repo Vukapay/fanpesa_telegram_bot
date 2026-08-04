@@ -7,6 +7,7 @@ All configuration is loaded from environment variables.
 from functools import lru_cache
 
 from pydantic import Field
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -14,7 +15,7 @@ class Settings(BaseSettings):
     """Application configuration."""
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "env"),
         case_sensitive=False,
         extra="ignore",
     )
@@ -61,6 +62,18 @@ class Settings(BaseSettings):
     def support_phone_telegram(self) -> str:
         """Digits-only phone number for Telegram's `tg://resolve?phone=` deep link."""
         return "".join(char for char in self.support_phone if char.isdigit())
+
+    @field_validator("webhook_url", mode="before")
+    @classmethod
+    def _normalize_webhook_url(cls, value: str | None) -> str | None:
+        if not isinstance(value, str):
+            return value
+
+        normalized = value.strip()
+        if normalized.upper().startswith("WEBHOOK_URL="):
+            normalized = normalized.split("=", 1)[1].strip()
+
+        return normalized or None
 
 
 @lru_cache

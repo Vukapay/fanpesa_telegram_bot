@@ -5,7 +5,8 @@ Integration tests for the FastAPI metadata/health/readiness/liveness endpoints.
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+from app.main import _build_webhook_url, app
+from app.webhooks.telegram import WEBHOOK_PATH
 
 
 @pytest.fixture
@@ -52,3 +53,16 @@ def test_webhook_returns_503_when_not_configured(client: TestClient) -> None:
     response = client.post("/webhooks/telegram", json={"update_id": 1})
 
     assert response.status_code == 503
+
+
+def test_webhook_aliases_return_503_when_not_configured(client: TestClient) -> None:
+    for path in ("/webhook", "/telegram/webhook"):
+        response = client.post(path, json={"update_id": 1})
+        assert response.status_code == 503, path
+
+
+def test_build_webhook_url_normalizes_common_values() -> None:
+    assert _build_webhook_url("https://example.com") == f"https://example.com{WEBHOOK_PATH}"
+    assert _build_webhook_url(f"https://example.com{WEBHOOK_PATH}") == f"https://example.com{WEBHOOK_PATH}"
+    assert _build_webhook_url("https://example.com/telegram/webhook") == "https://example.com/telegram/webhook"
+    assert _build_webhook_url("https://example.com/webhooks/telegram") == "https://example.com/webhooks/telegram"
