@@ -63,6 +63,15 @@ def test_webhook_aliases_return_503_when_not_configured(client: TestClient) -> N
 
 def test_build_webhook_url_normalizes_common_values() -> None:
     assert _build_webhook_url("https://example.com") == f"https://example.com{WEBHOOK_PATH}"
-    assert _build_webhook_url(f"https://example.com{WEBHOOK_PATH}") == f"https://example.com{WEBHOOK_PATH}"
-    assert _build_webhook_url("https://example.com/telegram/webhook") == "https://example.com/telegram/webhook"
-    assert _build_webhook_url("https://example.com/webhooks/telegram") == "https://example.com/webhooks/telegram"
+    assert (
+        _build_webhook_url(f"https://example.com{WEBHOOK_PATH}")
+        == f"https://example.com{WEBHOOK_PATH}"
+    )
+    assert (
+        _build_webhook_url("https://example.com/telegram/webhook")
+        == "https://example.com/telegram/webhook"
+    )
+    assert (
+        _build_webhook_url("https://example.com/webhooks/telegram")
+        == "https://example.com/webhooks/telegram"
+    )
