@@ -23,9 +23,9 @@ import re
 from telegram.ext import (
     Application,
     BaseHandler,
+    CallbackQueryHandler,
     CommandHandler,
     MessageHandler,
-    CallbackQueryHandler,
     filters,
 )
 

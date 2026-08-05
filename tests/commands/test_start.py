@@ -6,8 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from app.bot.commands.start import start
-from app.bot.commands.start import aviator_promo
+from app.bot.commands.start import aviator_promo, start
 
 
 @pytest.fixture
