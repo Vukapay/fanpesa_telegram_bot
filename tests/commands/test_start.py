@@ -6,12 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-<<<<<<< HEAD
 from app.bot.commands.start import aviator_promo, start
-=======
-from app.bot.commands.start import aviator_promo
-from app.bot.commands.start import start
->>>>>>> ddb21bc28b6df9305a89b791969db55fbdbd5294
 
 
 @pytest.fixture

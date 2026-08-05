@@ -31,7 +31,7 @@ from telegram.ext import (
 
 from app.bot.commands.about import about
 from app.bot.commands.help import help_command
-from app.bot.commands.start import start, aviator_promo
+from app.bot.commands.start import aviator_promo, start
 from app.bot.commands.support import support
 from app.config.settings import settings
 from app.core.constants import Buttons
