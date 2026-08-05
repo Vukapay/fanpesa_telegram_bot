@@ -27,7 +27,8 @@ from fastapi import FastAPI
 from app.bot.application import create_application
 from app.config.settings import settings
 from app.core.logger import logger
-from app.webhooks.telegram import WEBHOOK_PATH, router as telegram_webhook_router
+from app.webhooks.telegram import WEBHOOK_PATH
+from app.webhooks.telegram import router as telegram_webhook_router
 
 
 def _is_bot_token_configured() -> bool:
