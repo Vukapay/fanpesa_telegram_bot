@@ -25,6 +25,7 @@ def launch_app_keyboard() -> InlineKeyboardMarkup:
 
     keyboard = [
         [_web_app_button("🚀 Open FanPesa", settings.webapp_url)],
+        [_web_app_button("✈️ Play Aviator 🔥", settings.aviator_url)],
         [
             _web_app_button("📝 Register", settings.register_url),
             _web_app_button("🔐 Login", settings.login_url),
@@ -46,6 +47,16 @@ def support_keyboard() -> InlineKeyboardMarkup:
 
     keyboard = [
         [InlineKeyboardButton("🛟 Message Support", url=_support_chat_url())],
+    ]
+
+    return InlineKeyboardMarkup(keyboard)
+
+
+def aviator_keyboard() -> InlineKeyboardMarkup:
+    """Keyboard shown alongside the Aviator promo message."""
+
+    keyboard = [
+        [_web_app_button("✈️ Play Aviator Now 🔥", settings.aviator_url)],
     ]
 
     return InlineKeyboardMarkup(keyboard)

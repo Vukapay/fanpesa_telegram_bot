@@ -46,6 +46,8 @@
     "DEPOSIT_URL": "https://www.fanpesa.com/deposit",
     "WITHDRAW_URL": "https://www.fanpesa.com/withdrawal",
     "PROMOTION_URL": "https://www.fanpesa.com/promotion",
+    "AVIATOR_URL": "https://www.fanpesa.com/gameLobby/1/9/1138",
+    "AVIATOR_IMAGE_URL": "https://de2.sportal365images.com/process/smp-betway-images/blog.betway.com.en/16042025/b404a83d-33f6-450b-9b1c-486252c35c0a.jpg",
     "SUPPORT_EMAIL": "support@fanpesa.com",
     "SUPPORT_PHONE": "+254 745 275 966",
     "WEBHOOK_URL": "https://bot.fanpesa.com"

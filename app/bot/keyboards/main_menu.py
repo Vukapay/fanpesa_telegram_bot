@@ -8,12 +8,12 @@ from app.config.settings import settings
 
 
 def main_menu() -> ReplyKeyboardMarkup:
-    """Persistent menu: Open FanPesa, Register, Login, Deposit, Withdraw, Support, Promotion.
+    """Persistent menu: Open FanPesa, Aviator, Register, Login, Deposit, Withdraw, Support, Promotion.
 
-    Open FanPesa/Register/Login/Deposit/Withdraw/Promotion open the
-    Mini App directly (`web_app`) — tapping them never sends a message
-    back to the bot, so no handler is registered for them. Support
-    does send a message, since it replies with bot-side content.
+    Open FanPesa/Aviator/Register/Login/Deposit/Withdraw/Promotion open
+    the Mini App directly (`web_app`) — tapping them never sends a
+    message back to the bot, so no handler is registered for them.
+    Support does send a message, since it replies with bot-side content.
     """
 
     keyboard = [
@@ -21,6 +21,12 @@ def main_menu() -> ReplyKeyboardMarkup:
             KeyboardButton(
                 "🚀 Open FanPesa",
                 web_app=WebAppInfo(url=settings.webapp_url),
+            ),
+        ],
+        [
+            KeyboardButton(
+                "✈️ Aviator",
+                web_app=WebAppInfo(url=settings.aviator_url),
             ),
         ],
         [

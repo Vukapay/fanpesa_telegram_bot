@@ -39,3 +39,5 @@ class Buttons:
     SUPPORT = "🛟 Support"
 
     PROMOTION = "🎁 Promotion"
+
+    AVIATOR = "✈️ Aviator"

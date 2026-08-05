@@ -34,10 +34,11 @@ Available Commands
 /about — learn more about FanPesa
 /support — message our support team directly on Telegram
 
-📝 Register, 🔐 Login, 💳 Deposit, 💸 Withdraw, and 🎁 Promotion open
-the FanPesa Mini App directly from the menu below — everything
-happens without ever leaving Telegram.
+✈️ Aviator, 📝 Register, 🔐 Login, 💳 Deposit, 💸 Withdraw, and
+🎁 Promotion open the FanPesa Mini App directly from the menu below —
+everything happens without ever leaving Telegram.
 
 Betting itself happens inside the FanPesa Mini App — tap
-"🚀 Open FanPesa" to place bets, track odds, and manage your slips.
+"🚀 Open FanPesa" to place bets, track odds, and manage your slips,
+or jump straight into "✈️ Aviator", our most popular game.
 """)

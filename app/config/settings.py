@@ -44,6 +44,13 @@ class Settings(BaseSettings):
     deposit_url: str = Field(default="https://www.fanpesa.com/deposit")
     withdraw_url: str = Field(default="https://www.fanpesa.com/withdrawal")
     promotion_url: str = Field(default="https://www.fanpesa.com/promotion")
+    aviator_url: str = Field(default="https://www.fanpesa.com/gameLobby/1/9/1138")
+    aviator_image_url: str = Field(
+        default=(
+            "https://de2.sportal365images.com/process/smp-betway-images/"
+            "blog.betway.com.en/16042025/b404a83d-33f6-450b-9b1c-486252c35c0a.jpg"
+        )
+    )
 
     # -------------------------------------------------
     # Support

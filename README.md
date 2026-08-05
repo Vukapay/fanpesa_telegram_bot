@@ -62,6 +62,8 @@ If you don't have one yet, create it with the variables below.
 | `DEPOSIT_URL`   | Mini App page opened by the Deposit button          | `https://www.fanpesa.com/deposit`    |
 | `WITHDRAW_URL`  | Mini App page opened by the Withdraw button         | `https://www.fanpesa.com/withdrawal` |
 | `PROMOTION_URL` | Mini App page opened by the Promotion button        | `https://www.fanpesa.com/promotion`  |
+| `AVIATOR_URL`   | Mini App page opened by the Aviator button          | `https://www.fanpesa.com/gameLobby/1/9/1138` |
+| `AVIATOR_IMAGE_URL` | Promo image sent alongside `/start`'s Aviator callout | *(Aviator artwork URL)*        |
 | `SUPPORT_EMAIL` | Email shown by `/support`                           | `support@fanpesa.com`                |
 | `SUPPORT_PHONE` | Phone number `/support` opens a Telegram chat with  | `+254 745 275 966`                   |
 | `LOG_LEVEL`     | Python logging level                                | `INFO`                               |
@@ -97,9 +99,9 @@ python -m app.bot.application
 ```
 
 The bot runs in polling mode and responds to `/start`, `/help`,
-`/about`, and `/support`. The persistent menu's Register, Login,
-Deposit, Withdraw, and Promotion buttons open the Mini App directly
-and never reach the bot process at all.
+`/about`, and `/support`. The persistent menu's Aviator, Register,
+Login, Deposit, Withdraw, and Promotion buttons open the Mini App
+directly and never reach the bot process at all.
 
 ## Running with Docker
 
@@ -119,10 +121,12 @@ docker compose exec app python -m app.bot.application
 
 1. Create a bot with [@BotFather](https://t.me/BotFather) and copy the
    token into `.env` as `BOT_TOKEN`.
-2. Set `REGISTER_URL`, `LOGIN_URL`, `DEPOSIT_URL`, `WITHDRAW_URL`, and
-   `PROMOTION_URL` in `.env` once the real Mini App pages exist — they
-   default to `https://www.fanpesa.com/{register,login,deposit,withdrawal,promotion}`.
-   No code changes are needed to update them later.
+2. Set `REGISTER_URL`, `LOGIN_URL`, `DEPOSIT_URL`, `WITHDRAW_URL`,
+   `PROMOTION_URL`, and `AVIATOR_URL` in `.env` once the real Mini App
+   pages exist — they default to
+   `https://www.fanpesa.com/{register,login,deposit,withdrawal,promotion}`
+   and the game lobby URL respectively. No code changes are needed to
+   update them later.
 3. `web_app` buttons only work in a private chat with the bot (not in
    groups), and only need to be on an HTTPS domain — no BotFather
    registration is required for these per-message buttons (that's only
