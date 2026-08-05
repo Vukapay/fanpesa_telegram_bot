@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from app.bot.commands.start import start
 from app.bot.commands.start import aviator_promo
+from app.bot.commands.start import start
 
 
 @pytest.fixture
@@ -31,7 +31,7 @@ async def test_start_sends_welcome_message_with_launch_keyboard(
     assert update.message.reply_text.await_count == 2
     # Promo photo is no longer sent by /start; it's shown after the
     # user explicitly requests the Aviator promo.
-    assert getattr(update.message, "reply_photo").await_count == 0
+    assert update.message.reply_photo.await_count == 0
 
     welcome_call = update.message.reply_text.await_args_list[0]
     assert "Welcome to FanPesa" in welcome_call.kwargs["text"]
