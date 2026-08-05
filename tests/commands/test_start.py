@@ -7,6 +7,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 
 from app.bot.commands.start import start
+from app.bot.commands.start import aviator_promo
 
 
 @pytest.fixture
@@ -28,12 +29,33 @@ async def test_start_sends_welcome_message_with_launch_keyboard(
     await start(update, context)
 
     assert update.message.reply_text.await_count == 2
-    assert update.message.reply_photo.await_count == 1
+    # Promo photo is no longer sent by /start; it's shown after the
+    # user explicitly requests the Aviator promo.
+    assert getattr(update.message, "reply_photo").await_count == 0
 
     welcome_call = update.message.reply_text.await_args_list[0]
     assert "Welcome to FanPesa" in welcome_call.kwargs["text"]
     assert welcome_call.kwargs["reply_markup"] is not None
 
-    aviator_call = update.message.reply_photo.await_args_list[0]
-    assert "AVIATOR" in aviator_call.kwargs["caption"]
-    assert aviator_call.kwargs["reply_markup"] is not None
+    # aviator photo is now sent by the callback handler; see test below.
+
+
+async def test_aviator_promo_callback_sends_photo(
+    monkeypatch: MagicMock,
+) -> None:
+    mock_query = MagicMock()
+    mock_query.answer = AsyncMock()
+    mock_query.message = MagicMock()
+    mock_query.message.chat = MagicMock()
+    mock_query.message.chat.id = 123
+
+    mock_update = MagicMock()
+    mock_update.callback_query = mock_query
+
+    mock_context = MagicMock()
+    mock_context.bot.send_photo = AsyncMock()
+
+    await aviator_promo(mock_update, mock_context)
+
+    mock_query.answer.assert_awaited()
+    assert mock_context.bot.send_photo.await_count == 1

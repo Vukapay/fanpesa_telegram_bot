@@ -20,11 +20,18 @@ from __future__ import annotations
 
 import re
 
-from telegram.ext import Application, BaseHandler, CommandHandler, MessageHandler, filters
+from telegram.ext import (
+    Application,
+    BaseHandler,
+    CommandHandler,
+    MessageHandler,
+    CallbackQueryHandler,
+    filters,
+)
 
 from app.bot.commands.about import about
 from app.bot.commands.help import help_command
-from app.bot.commands.start import start
+from app.bot.commands.start import start, aviator_promo
 from app.bot.commands.support import support
 from app.config.settings import settings
 from app.core.constants import Buttons
@@ -42,6 +49,7 @@ def _build_handlers() -> list[BaseHandler]:
     """Return every command and menu-button handler for the bot."""
     return [
         CommandHandler("start", start),
+        CallbackQueryHandler(aviator_promo, pattern=r"^aviator_promo$"),
         CommandHandler("help", help_command),
         CommandHandler("about", about),
         CommandHandler("support", support),

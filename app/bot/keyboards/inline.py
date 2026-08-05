@@ -25,7 +25,10 @@ def launch_app_keyboard() -> InlineKeyboardMarkup:
 
     keyboard = [
         [_web_app_button("🚀 Open FanPesa", settings.webapp_url)],
-        [_web_app_button("✈️ Play Aviator 🔥", settings.aviator_url)],
+        # Show a callback button for Aviator so the bot can send the promo
+        # only after the user requests it. The actual web app opener remains
+        # on the promo keyboard (`aviator_keyboard`).
+        [InlineKeyboardButton("✈️ Play Aviator 🔥", callback_data="aviator_promo")],
         [
             _web_app_button("📝 Register", settings.register_url),
             _web_app_button("🔐 Login", settings.login_url),
