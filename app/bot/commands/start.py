@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from telegram import Update
+from telegram.error import BadRequest
 from telegram.ext import ContextTypes
 
 from app.bot.keyboards.inline import aviator_keyboard, launch_app_keyboard
@@ -66,7 +67,14 @@ async def aviator_promo(
     if query is None:
         return
 
-    await query.answer()
+    try:
+        await query.answer()
+    except BadRequest:
+        # The callback query expired before we got to it (e.g. it was
+        # queued while the bot was cold-starting) — Telegram no longer
+        # accepts an answer for it, but the promo photo below is still
+        # useful, so keep going instead of aborting.
+        logger.warning("action=aviator_promo callback query expired, continuing anyway")
 
     chat = query.message.chat if query.message else update.effective_chat
     if chat is None:

@@ -10,7 +10,7 @@ incoming update to that already-running application.
 
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, HTTPException, Request, status
 from telegram import Update
 
 router = APIRouter(tags=["webhooks"])
@@ -20,8 +20,16 @@ WEBHOOK_PATH = "/webhooks/telegram"
 @router.post(WEBHOOK_PATH)
 @router.post("/webhook")
 @router.post("/telegram/webhook")
-async def telegram_webhook(request: Request) -> dict[str, bool]:
-    """Receive a Telegram update and dispatch it to the running bot application."""
+async def telegram_webhook(request: Request, background_tasks: BackgroundTasks) -> dict[str, bool]:
+    """Receive a Telegram update and dispatch it to the running bot application.
+
+    Acknowledges Telegram immediately and processes the update in the
+    background. Awaiting the full handler chain here (which includes
+    outbound Telegram API calls, e.g. `reply_text`/`answer`) delays the
+    response enough to trigger Telegram's webhook retries (duplicate
+    commands) and to let queued callback queries go stale before
+    `answer()` is called on them.
+    """
     application = request.app.state.telegram_application
     if application is None:
         raise HTTPException(
@@ -31,6 +39,6 @@ async def telegram_webhook(request: Request) -> dict[str, bool]:
 
     payload = await request.json()
     update = Update.de_json(payload, application.bot)
-    await application.process_update(update)
+    background_tasks.add_task(application.process_update, update)
 
     return {"ok": True}

@@ -20,11 +20,13 @@ from __future__ import annotations
 
 import re
 
+from telegram import Update
 from telegram.ext import (
     Application,
     BaseHandler,
     CallbackQueryHandler,
     CommandHandler,
+    ContextTypes,
     MessageHandler,
     filters,
 )
@@ -57,12 +59,23 @@ def _build_handlers() -> list[BaseHandler]:
     ]
 
 
+async def _log_error(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log unhandled exceptions from handlers instead of PTB's raw traceback dump."""
+    logger.error(
+        "action=unhandled_error update=%s",
+        update if isinstance(update, Update) else repr(update),
+        exc_info=context.error,
+    )
+
+
 def create_application() -> Application:
     """Build and configure the Telegram `Application` for FanPesa."""
     application = Application.builder().token(settings.bot_token).build()
 
     for handler in _build_handlers():
         application.add_handler(handler)
+
+    application.add_error_handler(_log_error)
 
     logger.info("Telegram application configured with %d handlers", len(_build_handlers()))
 
