@@ -74,7 +74,10 @@ async def aviator_promo(
         # queued while the bot was cold-starting) — Telegram no longer
         # accepts an answer for it, but the promo photo below is still
         # useful, so keep going instead of aborting.
-        logger.warning("action=aviator_promo callback query expired, continuing anyway")
+        # This is an expected, non-fatal condition (callback queries can
+        # expire while the bot is cold-starting). Log at DEBUG to avoid
+        # noisy warnings in normal operation.
+        logger.debug("action=aviator_promo callback query expired, continuing anyway")
 
     chat = query.message.chat if query.message else update.effective_chat
     if chat is None:
