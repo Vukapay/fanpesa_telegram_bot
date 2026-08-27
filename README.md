@@ -193,14 +193,14 @@ The Worker-only deployment must bundle `src/worker.js`. It must not build
 `Dockerfile`, install `requirements.txt`, or show `FANPESA_CONTAINER` or
 `FanPesaContainer` in the deployment output.
 
-### Custom domain (`bot.fanpesa.com`)
+### Custom domain (`bot.playfanpesa.com`)
 
-The `routes` entry in `wrangler.jsonc` only works if **`fanpesa.com` is
+The `routes` entry in `wrangler.jsonc` only works if **`playfanpesa.com` is
 already an active zone on this Cloudflare account** (nameservers pointed
 at Cloudflare, or otherwise onboarded). That step happens in the
 Cloudflare dashboard and needs your account access — this repo can't do
 it for you. Once the zone exists, `wrangler deploy` provisions the
-`bot.fanpesa.com` custom domain and its TLS certificate automatically. If
+`bot.playfanpesa.com` custom domain and its TLS certificate automatically. If
 you'd rather verify the deploy first, delete the `routes` block and
 you'll get a free `<name>.<subdomain>.workers.dev` URL instead — add the
 custom domain back once the zone is ready.
@@ -208,10 +208,16 @@ custom domain back once the zone is ready.
 ### Deploy
 
 ```powershell
+npx wrangler secret put BOT_TOKEN
 npm run deploy
 ```
 
-This deploys the Worker. Check status with:
+The first command stores the Telegram token as an encrypted Worker secret.
+It does not belong in `wrangler.jsonc`, `.env` committed to Git, or Worker
+Build variables. The second command deploys the Worker from the repository
+root.
+
+Check deployment status with:
 
 ```powershell
 npx wrangler deployments list
@@ -220,11 +226,21 @@ npx wrangler tail
 
 ### Verify
 
-1. Visit `https://bot.fanpesa.com/health` once to return a healthy status
-   and register the Telegram webhook (use the `workers.dev` URL if needed).
+1. Visit `https://bot.playfanpesa.com/health` once. It should return:
+
+   ```json
+   {"status":"ok","application":"FanPesa Telegram Bot","version":"1.0.0"}
+   ```
+
+   The request also registers the Telegram webhook at
+   `https://bot.playfanpesa.com/webhooks/telegram`.
 2. Message `/start` to [@fanpesa_bot](https://t.me/fanpesa_bot) — updates
    now arrive via webhook instead of polling.
 3. `npx wrangler tail` streams the Worker's logs if anything looks wrong.
+
+The Worker deployment is successful when Wrangler reports the
+`bot.playfanpesa.com (custom domain)` trigger and does not report a
+Container, Durable Object, Docker image, or Python build.
 
 ### Troubleshooting deployment failures
 

@@ -4,11 +4,11 @@
   "main": "src/worker.js",
   "compatibility_date": "2026-07-28",
 
-  // Custom domain — requires fanpesa.com to be an active zone on this
+  // Custom domain — requires playfanpesa.com to be an active zone on this
   // Cloudflare account. Remove this block to fall back to the default
   // <name>.<subdomain>.workers.dev URL.
   "routes": [
-    { "pattern": "bot.fanpesa.com", "custom_domain": true }
+    { "pattern": "bot.playfanpesa.com", "custom_domain": true }
   ],
 
   "observability": {
@@ -44,6 +44,6 @@
     "AVIATOR_IMAGE_URL": "https://de2.sportal365images.com/process/smp-betway-images/blog.betway.com.en/16042025/b404a83d-33f6-450b-9b1c-486252c35c0a.jpg",
     "SUPPORT_EMAIL": "support@fanpesa.com",
     "SUPPORT_PHONE": "+254 745 275 966",
-    "WEBHOOK_URL": "https://bot.fanpesa.com"
+    "WEBHOOK_URL": "https://bot.playfanpesa.com"
   }
 }
