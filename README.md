@@ -14,12 +14,11 @@ exist on fanpesa.com.
 
 ## Overview
 
-- **Telegram bot** (`python-telegram-bot` v22) — `/start`, `/help`,
-  `/about`, `/support` commands, plus a persistent menu and inline
-  keyboard of direct links. Runs via polling locally, or via webhook
-  in production (see "Deploying to Cloudflare" below).
-- **FastAPI service** (`app/main.py`) — health/readiness/liveness
-  endpoints, and (in production) the Telegram webhook endpoint.
+- **Telegram bot** — the production implementation is the stateless
+   JavaScript Worker in `src/worker.js`; the Python implementation in `app/`
+   supports local polling and API development.
+- **Cloudflare Worker** — receives Telegram webhooks, calls Telegram's HTTPS
+   Bot API, and serves health/readiness/liveness endpoints.
 
 ## Project layout
 
@@ -111,8 +110,8 @@ docker compose exec app python -m app.bot.application
    doesn't use).
 4. Start the bot with `python -m app.bot.application` — polling mode
    requires no public URL.
-5. For production, switch to webhook mode: set `WEBHOOK_URL` — see
-   "Deploying to Cloudflare" below, which automates the rest.
+5. For production, deploy the Worker described below. Do not run the local
+   polling process at the same time as the production webhook.
 
 ### Support
 
@@ -176,6 +175,24 @@ npx wrangler secret put BOT_TOKEN
 Paste your real token when prompted. It's encrypted at rest by Cloudflare
 and never appears in `wrangler.jsonc` or git.
 
+### Worker Builds settings
+
+If deploying through **Cloudflare Worker Builds**, configure the project as
+follows:
+
+| Setting | Value |
+| --- | --- |
+| Repository | `Vukapay/fanpesa_telegram_bot` |
+| Branch | `main` |
+| Root directory | `/` |
+| Build command | Leave blank |
+| Deploy command | `npx wrangler deploy` |
+| Version command | Leave blank |
+
+The Worker-only deployment must bundle `src/worker.js`. It must not build
+`Dockerfile`, install `requirements.txt`, or show `FANPESA_CONTAINER` or
+`FanPesaContainer` in the deployment output.
+
 ### Custom domain (`bot.fanpesa.com`)
 
 The `routes` entry in `wrangler.jsonc` only works if **`fanpesa.com` is
@@ -208,6 +225,36 @@ npx wrangler tail
 2. Message `/start` to [@fanpesa_bot](https://t.me/fanpesa_bot) — updates
    now arrive via webhook instead of polling.
 3. `npx wrangler tail` streams the Worker's logs if anything looks wrong.
+
+### Troubleshooting deployment failures
+
+If Cloudflare reports:
+
+```text
+The build token selected for this build has been deleted or rolled
+Unauthorized
+```
+
+Open **Workers & Pages > fanpesa-bot > Settings > Builds**, replace the
+deleted or rotated build token, save the settings, and start a new build.
+The build token is a Cloudflare deployment credential; it is separate from
+the Telegram `BOT_TOKEN` secret.
+
+If the logs still show `FANPESA_CONTAINER`, `FanPesaContainer`, Docker, or
+`python:3.12-slim`, Cloudflare is using stale remote Worker configuration.
+Confirm that Worker Builds points to `main` and uses the settings above.
+If the old Container configuration remains attached to the remote Worker,
+remove the old Worker and deploy the current repository as a new Worker.
+
+Before retrying, validate locally from the repository root:
+
+```powershell
+npm run check
+npx wrangler deploy --dry-run
+```
+
+The dry run should list only environment-variable bindings and should not
+list a Container, Durable Object, or Docker image.
 
 ### Things worth knowing
 
