@@ -11,30 +11,8 @@
     { "pattern": "bot.fanpesa.com", "custom_domain": true }
   ],
 
-  // Runs the existing Dockerfile as a long-lived container instance.
-  "containers": [
-    {
-      "class_name": "FanPesaContainer",
-      "image": "./Dockerfile",
-      "instance_type": "lite",
-      "max_instances": 1
-    }
-  ],
-
-  // Containers are addressed through a Durable Object binding.
-  "durable_objects": {
-    "bindings": [
-      { "name": "FANPESA_CONTAINER", "class_name": "FanPesaContainer" }
-    ]
-  },
-
-  "migrations": [
-    { "tag": "v1", "new_sqlite_classes": ["FanPesaContainer"] }
-  ],
-
   // Non-secret configuration, visible in the dashboard. Anything
-  // sensitive (BOT_TOKEN, etc.) must be set with `wrangler secret put`
-  // instead — see README.md's "Deploying to Cloudflare" section.
+  // Sensitive values such as BOT_TOKEN must be set with `wrangler secret put`.
   "vars": {
     "APP_NAME": "FanPesa Telegram Bot",
     "ENVIRONMENT": "production",

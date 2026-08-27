@@ -34,39 +34,16 @@ app/
 └── main.py         FastAPI application entry point
 ```
 
-## Setup
+Local configuration is read from `.env`:
 
-### Prerequisites
-
-- Python 3.12+
-- A Telegram bot token from [@BotFather](https://t.me/BotFather)
-- Docker (optional, for containerized runs)
-
-### Environment configuration
-
-All configuration lives in a single `.env` file at the project root
-(gitignored — it holds the real bot token, so it's never committed).
-If you don't have one yet, create it with the variables below.
-
-| Variable        | Description                                       | Default                            |
-| --------------- | -------------------------------------------------- | ------------------------------------ |
-| `APP_NAME`      | Application display name                            | `FanPesa Telegram Bot`               |
-| `APP_VERSION`   | Application version                                 | `1.0.0`                              |
-| `ENVIRONMENT`   | `development`, `staging`, or `production`           | `development`                        |
-| `DEBUG`         | Enable debug behaviour                              | `True`                                |
-| `BOT_TOKEN`     | Telegram bot token — **never commit a real one**    | `CHANGE_ME`                          |
-| `WEBHOOK_URL`   | Public URL for webhook mode (leave blank in dev)    | *(empty)*                            |
-| `WEBAPP_URL`    | FanPesa Mini App URL opened by the launch button    | `https://www.fanpesa.com`            |
-| `REGISTER_URL`  | Mini App page opened by the Register button         | `https://www.fanpesa.com/register`   |
-| `LOGIN_URL`     | Mini App page opened by the Login button            | `https://www.fanpesa.com/login`      |
-| `DEPOSIT_URL`   | Mini App page opened by the Deposit button          | `https://www.fanpesa.com/deposit`    |
-| `WITHDRAW_URL`  | Mini App page opened by the Withdraw button         | `https://www.fanpesa.com/withdrawal` |
-| `PROMOTION_URL` | Mini App page opened by the Promotion button        | `https://www.fanpesa.com/promotion`  |
-| `AVIATOR_URL`   | Mini App page opened by the Aviator button          | `https://www.fanpesa.com/gameLobby/1/9/1138` |
-| `AVIATOR_IMAGE_URL` | Promo image sent alongside `/start`'s Aviator callout | *(Aviator artwork URL)*        |
-| `SUPPORT_EMAIL` | Email shown by `/support`                           | `support@fanpesa.com`                |
-| `SUPPORT_PHONE` | Phone number `/support` opens a Telegram chat with  | `+254 745 275 966`                   |
-| `LOG_LEVEL`     | Python logging level                                | `INFO`                               |
+| Variable | Purpose |
+| --- | --- |
+| `BOT_TOKEN` | Telegram bot token; never commit or expose it |
+| `WEBHOOK_URL` | Production webhook base URL; leave empty for polling |
+| `WEBAPP_URL`, `REGISTER_URL`, `LOGIN_URL` | Mini App destinations |
+| `DEPOSIT_URL`, `WITHDRAW_URL`, `PROMOTION_URL`, `AVIATOR_URL` | Mini App destinations |
+| `AVIATOR_IMAGE_URL` | Aviator promotion image |
+| `SUPPORT_EMAIL`, `SUPPORT_PHONE` | Support contact details |
 
 ## Running locally
 
@@ -170,27 +147,11 @@ Test suite layout:
 - `tests/integration/` — FastAPI endpoint tests
 - `tests/commands/` — Telegram command unit tests (`/start`)
 
-## Deployment guidance
+## Deploying to Cloudflare Workers
 
-- Build and run the production image via the provided `Dockerfile`
-  (non-root user, port `8000`, `uvicorn` entrypoint).
-- Run the FastAPI process and the Telegram bot process independently —
-  they scale differently and a bot crash should never take down the
-  health-checked API.
-- In production, prefer Telegram **webhook mode** over polling (see
-  above) so the bot can run behind the same infrastructure as the API.
-- Provide `BOT_TOKEN` and `WEBHOOK_URL` via your deployment platform's
-  secret/environment management — never commit real values to `.env`.
-
-## Deploying to Cloudflare (Containers)
-
-`python-telegram-bot` needs a persistent process and isn't Workers/Pyodide
--compatible, so this deploys as a **Cloudflare Container** — the existing
-Docker image, run as a long-lived process behind a thin front-end Worker
-(`src/worker.js`) — not a Worker rewrite. Webhook mode (not polling) is
-required in this setup: `app/main.py`'s `lifespan` already builds, starts,
-and registers the bot's webhook automatically whenever `WEBHOOK_URL` and a
-real `BOT_TOKEN` are present, so there's no manual `setWebhook` call to run.
+Production runs as a stateless JavaScript Worker in `src/worker.js`.
+It handles Telegram webhook updates directly through Telegram's HTTPS Bot
+API. The Python/FastAPI application and Docker files are for local use only.
 
 ### One-time setup
 
@@ -205,11 +166,8 @@ be done by you.
 
 ### Configuration
 
-`wrangler.jsonc` already declares every non-secret setting your bot needs
-under `"vars"` (`APP_NAME`, `WEBAPP_URL`, `REGISTER_URL`, etc. — the same
-values as `.env`), plus the `bot.fanpesa.com` custom-domain route and the
-container/Durable-Object bindings. The **one real secret** is the bot
-token:
+`wrangler.jsonc` declares the non-secret Worker variables. The bot token is
+the one secret:
 
 ```powershell
 npx wrangler secret put BOT_TOKEN
@@ -217,12 +175,6 @@ npx wrangler secret put BOT_TOKEN
 
 Paste your real token when prompted. It's encrypted at rest by Cloudflare
 and never appears in `wrangler.jsonc` or git.
-
-> `src/worker.js`'s `FanPesaContainer` constructor explicitly copies both
-> `vars` and secrets into the container's process environment
-> (`envVars`) — Cloudflare does **not** do this automatically. If you add
-> a new setting to `app/config/settings.py` later, add its key to
-> `FORWARDED_ENV_KEYS` in `src/worker.js` too, or the container won't see it.
 
 ### Custom domain (`bot.fanpesa.com`)
 
@@ -242,24 +194,20 @@ custom domain back once the zone is ready.
 npm run deploy
 ```
 
-This builds the Docker image, pushes it to Cloudflare's container
-registry, and deploys the Worker + container. The first deploy takes a
-few minutes; later ones are faster. Check status with:
+This deploys the Worker. Check status with:
 
 ```powershell
-npx wrangler deployments list   # Worker deploy history
-npx wrangler containers list    # container instance status
-npx wrangler tail               # live logs
+npx wrangler deployments list
+npx wrangler tail
 ```
 
 ### Verify
 
-1. `https://bot.fanpesa.com/health` should return a healthy status (or
-   the `workers.dev` URL if you haven't wired the domain yet).
+1. Visit `https://bot.fanpesa.com/health` once to return a healthy status
+   and register the Telegram webhook (use the `workers.dev` URL if needed).
 2. Message `/start` to [@fanpesa_bot](https://t.me/fanpesa_bot) — updates
    now arrive via webhook instead of polling.
-3. `npx wrangler tail` streams the container's logs live if anything
-   looks wrong.
+3. `npx wrangler tail` streams the Worker's logs if anything looks wrong.
 
 ### Things worth knowing
 
@@ -267,12 +215,3 @@ npx wrangler tail               # live logs
   do not also run `python -m app.bot.application` anywhere — Telegram
   delivers updates one way at a time, and the two modes will fight each
   other for them.
-- **Cold starts.** `sleepAfter: "10m"` in `src/worker.js` stops the
-  container after 10 minutes idle to save cost; the next request pays a
-  cold-start cost (typically seconds). Raise it or remove it if instant
-  responses matter more than idle cost.
-- **This is a young Cloudflare product.** Containers moved to general
-  availability recently and its `wrangler.jsonc` schema/CLI can still
-  shift. If `wrangler deploy` errors out on something in this file,
-  check [Cloudflare's current Containers docs](https://developers.cloudflare.com/containers/)
-  before assuming the code is wrong.
